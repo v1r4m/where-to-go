@@ -54,6 +54,8 @@ curl 'https://map.naver.com/p/api/panorama/nearby/127.8737772/38.2275148' \
 }
 ```
 
+## 파노라마 이미쥐 순서
+* left, front, right, back, bottom, top
 
 ## ㅎㅎ
 * QZuCo1JTy4wVlylyMIvURg 참고로 이 해쉬는 이 녀석 사실 잘 꼬라보면 base64/hex 인코딩된 uuid다. 
