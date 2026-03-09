@@ -1,0 +1,7 @@
+
+curl 'https://map.naver.com/p/api/panorama/nearby/127.8737772/38.2275148' \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'accept-language: ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4' \
+  -H 'cache-control: no-cache' \
+  -H 'expires: Sat, 01 Jan 2000 00:00:00 GMT' \
+  -H 'referer: https://map.naver.com/p?c=9.65,0,0,0,adh' 
