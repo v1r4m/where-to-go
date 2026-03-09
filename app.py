@@ -1,9 +1,13 @@
 import random
+import logging
+import requests
 from flask import Flask, render_template, jsonify
 from shapely.geometry import Point, Polygon, MultiPolygon
 from shapely.ops import unary_union
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # South Korea mainland + Jeju simplified polygon coordinates
 # (longitude, latitude) pairs
@@ -50,8 +54,50 @@ def index():
     return render_template("index.html")
 
 
+NAVER_HEADERS = {
+    "accept": "application/json, text/plain, */*",
+    "accept-language": "ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4",
+    "cache-control": "no-cache",
+    "referer": "https://map.naver.com/p?c=9.65,0,0,0,adh",
+}
+
+MAX_RETRIES = 10
+
+
+def fetch_panorama(lon: float, lat: float) -> dict | None:
+    """Fetch nearby panorama for given coordinates. Returns props dict or None."""
+    naver_url = f"https://map.naver.com/p/api/panorama/nearby/{lon}/{lat}"
+    logger.info(f"[Panorama] Requesting: {naver_url}")
+    try:
+        resp = requests.get(naver_url, headers=NAVER_HEADERS, timeout=5)
+        if resp.status_code == 200:
+            features = resp.json().get("features", [])
+            if features:
+                props = features[0]["properties"]
+                logger.info(f"[Panorama] Found: {props.get('id')} - {props.get('description')}")
+                return props
+        logger.info(f"[Panorama] No panorama at {lat}, {lon}")
+    except Exception as e:
+        logger.error(f"[Panorama] Error: {e}")
+    return None
+
+
 @app.route("/api/random")
 def api_random():
+    for attempt in range(MAX_RETRIES):
+        lat, lon = random_point_in_korea()
+        props = fetch_panorama(lon, lat)
+        if props:
+            return jsonify({
+                "lat": lat,
+                "lon": lon,
+                "panorama_id": props["id"],
+                "panorama_url": f"https://panorama.pstatic.net/image/{props['id']}/512/P",
+                "panorama_description": props.get("description", ""),
+            })
+        logger.info(f"[Panorama] Retry {attempt + 1}/{MAX_RETRIES}")
+
+    # Fallback: return coordinates without panorama
     lat, lon = random_point_in_korea()
     return jsonify({"lat": lat, "lon": lon})
 

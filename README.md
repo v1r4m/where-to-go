@@ -7,7 +7,9 @@ South Korea Randonautica
 * 이렇게 panorama가 static 서버에 올라와 있다. 
 ```
 https://panorama.pstatic.net/imageV3/QZuCo1JTy4wVlylyMIvURg/P
+https://panorama.pstatic.net/image/oHnufkqUAGFbhVy2EU1pJA/512/P
 ```
+* image버전에 따라 둘이 쬠 다른데 그건 중요한건 아니긴함
 * 그러니까, 좌표값을 저런 해쉬값으로 변환하는 테이블만 있으면 api인증을 우회하고 좌표값에서 가장 가까운 파노라마 이미지를 가져올 수 있다는 뜻이다. 글고 그런건 당근 있다. **세션쿠키 검증조차 없이.**
 ```
 curl 'https://map.naver.com/p/api/panorama/nearby/127.8737772/38.2275148' \
